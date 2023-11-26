@@ -15,6 +15,8 @@ use crate::ideal_gas::*;
 mod pr_eos;
 use pr_eos::*;
 
+mod cubic_roots;
+
 #[macro_use]
 extern crate approx;
 
