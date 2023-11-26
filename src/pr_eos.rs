@@ -14,6 +14,8 @@ pub fn get_temperature_peng_robinson_gas(
         let b = get_b(critical_pressure, critical_temperature);
         let kappa = get_kappa(accentricity_factor);
 
+        // to do for next time
+
         todo!()
 }
 
