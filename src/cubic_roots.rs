@@ -1,3 +1,5 @@
+use std::f64::consts::PI;
+
 use uom::si::{f64::*, angle::{radian, degree}};
 
 pub fn find_cubic_roots(b: f64,
@@ -38,13 +40,13 @@ d: f64) -> Vec<f64>{
             if q > 0.0 {
                 
                 y_k = -2.0 * (-p/3.0).sqrt()*
-                (phi_degrees/3.0 + 120.0 * k as f64);
+                ((phi_degrees/3.0 + 120.0 * k as f64) * PI/180.0).cos();
 
 
             } else if q < 0.0 {
 
                 y_k = 2.0 * (-p/3.0).sqrt()*
-                (phi_degrees/3.0 + 120.0 * k as f64);
+                ((phi_degrees/3.0 + 120.0 * k as f64) * PI/180.0).cos();
 
             } else {
                 // q = 0.0 case
@@ -53,7 +55,7 @@ d: f64) -> Vec<f64>{
                 // pi/2
 
                 y_k = 2.0 * (-p/3.0).sqrt()*
-                (phi_degrees/3.0 + 120.0 * k as f64);
+                ((phi_degrees/3.0 + 120.0 * k as f64)*PI/180.0).cos();
 
 
             }
