@@ -31,6 +31,36 @@ d: f64) -> Vec<f64>{
     if r < 0.0 {
 
         // expect 3 real roots
+        fn get_y_k_radians(k: usize, p: f64,
+        phi_radians: f64,
+        q:f64) -> f64 {
+            let y_k;
+
+            if q > 0.0 {
+                
+                y_k = -2.0 * (-p/3.0).sqrt()*
+                (phi_radians/3.0 + (120.0 * k as f64) * PI/180.0).cos();
+
+
+            } else if q < 0.0 {
+
+                y_k = 2.0 * (-p/3.0).sqrt()*
+                (phi_radians/3.0 + (120.0 * k as f64) * PI/180.0).cos();
+
+            } else {
+                // q = 0.0 case
+                // q = 0.0, means that phi is Acos(0)
+                // this implies phi is 90 degrees or 
+                // pi/2
+
+                y_k = 2.0 * (-p/3.0).sqrt()*
+                (phi_radians/3.0 + (120.0 * k as f64)*PI/180.0).cos();
+
+
+            }
+
+            return y_k;
+        }
 
         fn get_y_k(k: usize, p: f64,
         phi_degrees: f64,
@@ -71,15 +101,19 @@ d: f64) -> Vec<f64>{
         let minus_p_cube_by_27: f64 = -p.powf(3.0)/27.0;
 
         // note that phi is in radians
-        phi = (q_sq_by_4/minus_p_cube_by_27).acos();
+        phi = (q_sq_by_4/minus_p_cube_by_27).sqrt().acos();
 
         let phi_dimensioned = Angle::new::<radian>(phi);
         let phi_degrees: f64 = phi_dimensioned.get::<degree>();
+        let phi_radians: f64 = phi_dimensioned.get::<radian>();
 
-        y_0 = get_y_k(0, p, phi_degrees, q);
-        y_1 = Some(get_y_k(1, p, phi_degrees, q));
-        y_2 = Some(get_y_k(2, p, phi_degrees, q));
+        //y_0 = get_y_k(0, p, phi_degrees, q);
+        //y_1 = Some(get_y_k(1, p, phi_degrees, q));
+        //y_2 = Some(get_y_k(2, p, phi_degrees, q));
 
+        y_0 = get_y_k_radians(0, p, phi_radians, q);
+        y_1 = Some(get_y_k_radians(1, p, phi_radians, q));
+        y_2 = Some(get_y_k_radians(2, p, phi_radians, q));
 
     } else if r > 0.0 {
 
@@ -176,5 +210,22 @@ fn test_three_real_roots(){
     let solution = find_cubic_roots(b, c, d);
 
     panic!("{:?}",solution);
+
+}
+#[test]
+fn test_one_real_root(){
+    
+    // x^3 - 7x + 7 = 0
+    let b = 8.0;
+    let c = -7.0;
+    let d = 9.0;
+    let solution = find_cubic_roots(b, c, d);
+
+
+    assert_relative_eq!(
+        solution[0],-8.9001,
+    epsilon=0.001); 
+    //epsilon is the relative fractional error 
+    // if my error tolerance is 0.1%, then epsilon = 0.001
 
 }

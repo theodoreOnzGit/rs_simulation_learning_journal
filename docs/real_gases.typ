@@ -153,7 +153,7 @@ $ y_k = minus.plus 2 sqrt(-p/3) cos [phi/3 + 120k ] $
 
 Where k = 0, 1, 2
 
-and $ phi = cos^(-1) [(q^2 /4)/(-p^3/27)] $
+and $ phi = cos^(-1) sqrt((q^2 /4)/(-p^3/27)) $
 
 if q  > 0
 
