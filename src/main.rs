@@ -17,6 +17,8 @@ use pr_eos::*;
 
 mod cubic_roots;
 
+mod vector_multiplication;
+
 #[macro_use]
 extern crate approx;
 
