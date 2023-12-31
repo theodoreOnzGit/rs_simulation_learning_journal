@@ -181,6 +181,12 @@ d: f64) -> Vec<f64>{
 
     let mut solution_vec = vec![x_0];
     
+    match y_2 {
+        Some(y_2_value) => {
+            solution_vec.push(get_x_k(y_2_value, b));
+        },
+        None => (),
+    }
     match y_1 {
         Some(y_1_value) => {
             solution_vec.push(get_x_k(y_1_value, b));
@@ -188,12 +194,6 @@ d: f64) -> Vec<f64>{
         None => (),
     }
 
-    match y_2 {
-        Some(y_2_value) => {
-            solution_vec.push(get_x_k(y_2_value, b));
-        },
-        None => (),
-    }
 
 
     return solution_vec;
@@ -207,9 +207,53 @@ fn test_three_real_roots(){
     let b = 0.0;
     let c = -7.0;
     let d = 7.0;
-    let solution = find_cubic_roots(b, c, d);
+    let solution_vec = find_cubic_roots(b, c, d);
 
-    panic!("{:?}",solution);
+    // this is a bad way to do comparisons
+    //let root0 = solution[0];
+    //let root1 = solution[1];
+    //let root2 = solution[2];
+
+
+    // initial guess for minimum root
+    let mut min_root: f64 = f64::MAX;
+    // minimum root
+    for solution in solution_vec.iter() {
+        if solution < &min_root {
+            
+            min_root = *solution;
+
+        }
+
+    }
+
+    // initial guess for max root 
+    let mut max_root = f64::MIN;
+
+    for solution in solution_vec.iter() {
+        if solution > &max_root {
+            
+            max_root = *solution;
+
+        }
+
+    }
+
+    // this last part is a more elegant solution for sorting the vector,
+    // and finding min/max values in a vector
+    //https://rust-lang-nursery.github.io/rust-cookbook/algorithms/sorting.html#sort-a-vector-of-floats
+    let mut soln_vec_clone = solution_vec.clone();
+    soln_vec_clone.sort_by(|a, b| a.partial_cmp(b).unwrap());
+
+    max_root = *soln_vec_clone.last().unwrap();
+    min_root = *soln_vec_clone.first().unwrap();
+    let middle_root = soln_vec_clone[1];
+
+
+    assert_relative_eq!(min_root,-3.0489,epsilon=0.001);
+    assert_relative_eq!(max_root,1.6920,epsilon=0.001);
+    assert_relative_eq!(middle_root,1.3569,epsilon=0.001);
+
 
 }
 #[test]
