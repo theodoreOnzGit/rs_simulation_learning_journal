@@ -1,10 +1,14 @@
 use std::{ops::Deref, process::id};
 
-pub fn dot_product(vec1: Vec<f64>,vec2: Vec<f64>) -> f64 {
+pub fn dot_product(vec1: Vec<f64>,vec2: Vec<f64>) -> Option<f64> {
 
 
     // make sure vector lengths are identical, otherwise, we 
     // have a problem (todo)
+    
+    if vec1.len() != vec2.len() {
+        return None;
+    }
 
     // suppose the vectors are of equal length/dimension,
     // we can start multiplying
@@ -62,7 +66,7 @@ pub fn dot_product(vec1: Vec<f64>,vec2: Vec<f64>) -> f64 {
 
     let sum = vec3.iter().sum();
 
-    return sum;
+    return Some(sum);
 
 
 }
@@ -75,8 +79,111 @@ fn dot_product_sandbox() {
 
     let scalar = dot_product(vec1, vec2);
 
-    dbg!(scalar);
+    let value = match scalar {
+        Some(value) => value,
+        None => panic!(),
+    };
 
-    assert_relative_eq!(1529.79, scalar);
+    dbg!(value);
+
+    assert_relative_eq!(1529.79, value);
 
 }
+
+#[test]
+fn dot_product_error_handling() {
+
+    let vec1 = vec![0.1,0.2,0.5,124.3];
+    let vec2 = vec![0.1,3.2,0.5];
+
+    let scalar = dot_product(vec1, vec2);
+
+    let value = scalar.unwrap();
+
+    dbg!(value);
+
+    assert_relative_eq!(1529.79, value);
+
+}
+
+
+
+
+#[test]
+fn enum_demo(){
+    #[derive(Debug)]
+    pub enum EngineeringGrades {
+        A(f64),
+        B(f64),
+        C(f64),
+        D(f64),
+        E(f64),
+        F(f64)
+    }
+    // let's say on a scale of 0 to 100
+    // 75% and above is an A
+
+    fn convert_score_to_grade(score: f64) -> EngineeringGrades {
+        if score > 75.0 {
+            return EngineeringGrades::A(score);
+        } else if score > 65.0 {
+            return EngineeringGrades::B(score);
+        } else if score > 60.0 {
+            return EngineeringGrades::C(score);
+        } else if score > 55.0 {
+            return EngineeringGrades::D(score);
+        } else if score > 50.0 {
+            return EngineeringGrades::E(score);
+        } else {
+            return EngineeringGrades::F(score);
+        }
+    }
+    let my_engineering_grade = EngineeringGrades::B(67.0);
+
+    match my_engineering_grade {
+        EngineeringGrades::A(_score) => {
+            println!("well done, you are on the Dean's list");
+        },
+        EngineeringGrades::F(_score) => {
+            println!("you need to repeat the course");
+        },
+        EngineeringGrades::B(_score) => {
+            ()
+        },
+        EngineeringGrades::C(_score) => {
+            ()
+        },
+        EngineeringGrades::D(_score) => {
+            ()
+        },
+        EngineeringGrades::E(_score) => {
+            ()
+        }
+
+    }
+    dbg!(&my_engineering_grade);
+
+    let my_score: f64 = 84.0;
+
+    let my_engineering_grade = convert_score_to_grade(my_score);
+
+    dbg!(&my_engineering_grade);
+
+    // print special message based on your enum
+    // if you get A, then print well done!
+
+    match my_engineering_grade {
+        EngineeringGrades::A(_) => {
+            println!("well done, you are on the Dean's list");
+        },
+        EngineeringGrades::F(_) => {
+            println!("you need to repeat the course");
+        },
+        // for any score not A and F, do nothing
+        _ => (),
+
+    }
+
+}
+
+
