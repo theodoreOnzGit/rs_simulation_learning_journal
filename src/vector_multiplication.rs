@@ -1,14 +1,33 @@
 use std::{ops::Deref, process::id};
+use thiserror::Error;
 
-pub fn dot_product(vec1: Vec<f64>,vec2: Vec<f64>) -> Option<f64> {
+// more often in Rust codebases, you will see error enums
+#[derive(Error, Debug)]
+pub enum DotProductError {
+    #[error("the two vectors are of unequal length")]
+    VectorLengthsUnequal,
+    #[error("either one of the vector lengths is zero")]
+    VectorLengthZero,
+
+}
+
+pub fn dot_product(vec1: Vec<f64>,vec2: Vec<f64>) -> Result<f64, DotProductError> {
 
 
     // make sure vector lengths are identical, otherwise, we 
     // have a problem (todo)
+
+    if vec1.len() == 0 {
+        return Err(DotProductError::VectorLengthZero);
+    }
+    if vec2.len() == 0 {
+        return Err(DotProductError::VectorLengthZero);
+    }
     
     if vec1.len() != vec2.len() {
-        return None;
+        return Err(DotProductError::VectorLengthsUnequal);
     }
+
 
     // suppose the vectors are of equal length/dimension,
     // we can start multiplying
@@ -66,7 +85,7 @@ pub fn dot_product(vec1: Vec<f64>,vec2: Vec<f64>) -> Option<f64> {
 
     let sum = vec3.iter().sum();
 
-    return Some(sum);
+    return Ok(sum);
 
 
 }
@@ -80,8 +99,8 @@ fn dot_product_sandbox() {
     let scalar = dot_product(vec1, vec2);
 
     let value = match scalar {
-        Some(value) => value,
-        None => panic!(),
+        Ok(value) => value,
+        Err(err_msg) => panic!("{}",err_msg),
     };
 
     dbg!(value);
@@ -91,7 +110,7 @@ fn dot_product_sandbox() {
 }
 
 #[test]
-fn dot_product_error_handling() {
+fn dot_product_error_handling_unequal_length() {
 
     let vec1 = vec![0.1,0.2,0.5,124.3];
     let vec2 = vec![0.1,3.2,0.5];
@@ -106,6 +125,21 @@ fn dot_product_error_handling() {
 
 }
 
+#[test]
+fn dot_product_error_handling_zero_vector() {
+
+    let vec1 = vec![];
+    let vec2 = vec![0.1,3.2,0.5];
+
+    let scalar = dot_product(vec1, vec2);
+
+    let value = scalar.unwrap();
+
+    dbg!(value);
+
+    assert_relative_eq!(1529.79, value);
+
+}
 
 
 
