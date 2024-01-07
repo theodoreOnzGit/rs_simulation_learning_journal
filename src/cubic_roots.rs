@@ -3,9 +3,7 @@ use std::f64::consts::PI;
 use uom::si::f64::*;
 use uom::si::angle::radian;
 
-pub fn find_cubic_roots(b: f64,
-c: f64,
-d: f64) -> Vec<f64>{
+pub fn find_cubic_roots(b: f64, c: f64, d: f64) -> Vec<f64>{
 
     // r = (p/3)^3 + (q/2)^2
     let r: f64;
