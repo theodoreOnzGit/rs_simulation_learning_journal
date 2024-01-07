@@ -1,6 +1,7 @@
 use std::f64::consts::PI;
 
-use uom::si::{f64::*, angle::{radian, degree}};
+use uom::si::f64::*;
+use uom::si::angle::radian;
 
 pub fn find_cubic_roots(b: f64,
 c: f64,
@@ -62,7 +63,8 @@ d: f64) -> Vec<f64>{
             return y_k;
         }
 
-        fn get_y_k(k: usize, p: f64,
+        // redundant function
+        fn _get_y_k(k: usize, p: f64,
         phi_degrees: f64,
         q:f64) -> f64 {
             let y_k;
@@ -104,7 +106,6 @@ d: f64) -> Vec<f64>{
         phi = (q_sq_by_4/minus_p_cube_by_27).sqrt().acos();
 
         let phi_dimensioned = Angle::new::<radian>(phi);
-        let phi_degrees: f64 = phi_dimensioned.get::<degree>();
         let phi_radians: f64 = phi_dimensioned.get::<radian>();
 
         //y_0 = get_y_k(0, p, phi_degrees, q);
@@ -122,7 +123,9 @@ d: f64) -> Vec<f64>{
         // expect 1 real root, 2 complex roots
         // which are conjugates of each other
 
+        #[allow(non_snake_case)]
         let A: f64;
+        #[allow(non_snake_case)]
         let B: f64;
 
         let minus_q_by_2: f64 = -q/2.0;
@@ -152,7 +155,9 @@ d: f64) -> Vec<f64>{
         // expect 3 real roots, two of which are 
         // equal 
 
+        #[allow(non_snake_case)]
         let A: f64;
+        #[allow(non_snake_case)]
         let B: f64;
 
         let minus_q_by_2: f64 = -q/2.0;

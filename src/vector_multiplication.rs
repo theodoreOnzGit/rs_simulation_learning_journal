@@ -1,8 +1,7 @@
-use std::{ops::Deref, process::id};
 use thiserror::Error;
 
 // more often in Rust codebases, you will see error enums
-#[derive(Error, Debug)]
+#[derive(Error, Debug, PartialEq)]
 pub enum DotProductError {
     #[error("the two vectors are of unequal length")]
     VectorLengthsUnequal,
@@ -112,32 +111,47 @@ fn dot_product_sandbox() {
 #[test]
 fn dot_product_error_handling_unequal_length() {
 
+    // this is the intended behaviour: error 
+    let intended_error = DotProductError::VectorLengthsUnequal;
+
+    // run code
     let vec1 = vec![0.1,0.2,0.5,124.3];
     let vec2 = vec![0.1,3.2,0.5];
 
-    let scalar = dot_product(vec1, vec2);
+    let dot_product_result = dot_product(vec1, vec2);
 
-    let value = scalar.unwrap();
+    let actual_error = match dot_product_result {
+        Ok(_) => panic!("dot product function failed to catch error"),
+        Err(dot_prod_error) => dot_prod_error,
+    };
 
-    dbg!(value);
-
-    assert_relative_eq!(1529.79, value);
+    // assert if these are equal
+    assert_eq!(actual_error,intended_error);
 
 }
 
 #[test]
 fn dot_product_error_handling_zero_vector() {
 
+    // this is the intended behaviour: error where we have zero length 
+    // vectors 
+    let intended_error = DotProductError::VectorLengthZero;
+
+    // run code
     let vec1 = vec![];
-    let vec2 = vec![0.1,3.2,0.5];
+    let vec2 = vec![];
 
-    let scalar = dot_product(vec1, vec2);
+    let dot_product_result = dot_product(vec1, vec2);
 
-    let value = scalar.unwrap();
+    // if let and assert
+    if let Err(dot_prod_error) = dot_product_result {
+        assert_eq!(dot_prod_error,intended_error);
+        return;
+    } 
 
-    dbg!(value);
+    panic!("failed to catch intended error");
 
-    assert_relative_eq!(1529.79, value);
+
 
 }
 
