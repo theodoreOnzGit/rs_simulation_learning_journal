@@ -1,5 +1,7 @@
 
-use uom::si::{f64::*, thermodynamic_temperature::{degree_celsius, kelvin}, pressure::pascal, molar_volume::cubic_meter_per_mole, molar_heat_capacity::joule_per_kelvin_mole, ratio::ratio};
+use uom::si::f64::*;
+use uom::si::ratio::ratio;
+use uom::si::molar_heat_capacity::joule_per_kelvin_mole;
 
 use crate::cubic_roots::find_cubic_roots;
 
@@ -10,12 +12,12 @@ use crate::cubic_roots::find_cubic_roots;
 pub fn get_temperature_peng_robinson_gas(
     pressure: Pressure,
     specific_vol: MolarVolume, 
-    accentricity_factor: Ratio, 
+    acentricity_factor: Ratio, 
     critical_temperature: ThermodynamicTemperature, 
     critical_pressure: Pressure) -> ThermodynamicTemperature{
 
         let b = get_b(critical_pressure, critical_temperature);
-        let kappa = get_kappa(accentricity_factor);
+        let kappa = get_kappa(acentricity_factor);
 
         // to do for next time
 
@@ -25,12 +27,12 @@ pub fn get_temperature_peng_robinson_gas(
 pub fn get_pressure_peng_robinson_gas(
     temperature: ThermodynamicTemperature,
     molar_volume: MolarVolume,
-    accentricity_factor: Ratio,
+    acentricity_factor: Ratio,
     critical_pressure: Pressure,
     critical_temperature: ThermodynamicTemperature) -> Pressure{
         
         let b = get_b(critical_pressure, critical_temperature);
-        let kappa = get_kappa(accentricity_factor);
+        let kappa = get_kappa(acentricity_factor);
 
         // R
         let molar_gas_constant = 
@@ -66,18 +68,18 @@ pub fn get_pressure_peng_robinson_gas(
         / critical_pressure 
         * alpha;
 
-        let accentricity_term: Pressure = 
+        let acentricity_term: Pressure = 
         numerator/denominator;
 
 
-        let pressure = rt_over_v_minus_b - accentricity_term;
+        let pressure = rt_over_v_minus_b - acentricity_term;
         return pressure;
 }
 
 pub fn get_molar_volume_peng_robinson_eos_gas_and_vapour_like_roots(
     pressure: Pressure,
     temperature: ThermodynamicTemperature,
-    accentricity_factor: Ratio,
+    acentricity_factor: Ratio,
     critical_pressure: Pressure,
     critical_temperature: ThermodynamicTemperature) -> MolarVolume{
         
@@ -94,7 +96,7 @@ pub fn get_molar_volume_peng_robinson_eos_gas_and_vapour_like_roots(
         // A
         let capital_a: Ratio;
 
-        let kappa = get_kappa(accentricity_factor);
+        let kappa = get_kappa(acentricity_factor);
         let reduced_temperature: Ratio 
         = temperature/critical_temperature;
         let sqrt_alpha = Ratio::new::<ratio>(1.0)
@@ -182,6 +184,95 @@ pub fn get_molar_volume_peng_robinson_eos_gas_and_vapour_like_roots(
         panic!("unable to find vapour like volume roots");
 }
 
+#[test]
+fn crit_point_water_test_pr_eos(){
+ 
+    use uom::si::thermodynamic_temperature::kelvin;
+    use uom::si::pressure::megapascal;
+    use uom::si::molar_volume::cubic_meter_per_mole;
+    // expected behaviour
+    let water_crit_temperature = 
+        ThermodynamicTemperature::new::<kelvin>(647.1);
+    let water_crit_pressure = 
+        Pressure::new::<megapascal>(22.06);
+    let water_crit_vol = 
+        MolarVolume::new::<cubic_meter_per_mole>(0.0560/1000.0);
+
+    // set the input parameters for the function 
+
+    let pressure = water_crit_pressure;
+    let critical_pressure = water_crit_pressure;
+    let temperature = water_crit_temperature;
+    let critical_temperature = water_crit_temperature;
+    let acentricity_factor = Ratio::new::<ratio>(0.344);
+
+    // find volume using pr eos
+    let water_vap_vol_pr_eos: MolarVolume = 
+        get_molar_volume_peng_robinson_eos_gas_and_vapour_like_roots(
+            pressure, 
+            temperature, 
+            acentricity_factor, 
+            critical_pressure, 
+            critical_temperature);
+
+    // assert approx eq to within 30%
+
+    assert_relative_eq!(water_vap_vol_pr_eos.get::<cubic_meter_per_mole>(),
+                        water_crit_vol.get::<cubic_meter_per_mole>(),
+                        max_relative=0.30);
+
+}
+
+#[test]
+fn superheated_steam_test_pr_eos(){
+ 
+    use uom::si::thermodynamic_temperature::{kelvin,degree_celsius};
+    use uom::si::pressure::megapascal;
+    use uom::si::molar_volume::cubic_meter_per_mole;
+    use uom::si::specific_volume::cubic_meter_per_kilogram;
+    use uom::si::molar_mass::gram_per_mole;
+    // expected behaviour
+    let water_crit_temperature = 
+        ThermodynamicTemperature::new::<kelvin>(647.1);
+    let water_crit_pressure = 
+        Pressure::new::<megapascal>(22.06);
+    
+    let steam_temp = ThermodynamicTemperature::new::<degree_celsius>(600.0);
+    let steam_pressure = Pressure::new::<megapascal>(0.40);
+    let steam_specific_vol = SpecificVolume::new::
+        <cubic_meter_per_kilogram>(1.00558);
+
+    let water_mol_wt = MolarMass::new::<gram_per_mole>(18.0);
+
+    let expected_steam_molar_vol = steam_specific_vol * water_mol_wt;
+
+    //let steam_molar_vol = steam_specific_vol
+
+
+    // set the input parameters for the function 
+
+    let pressure = steam_pressure;
+    let critical_pressure = water_crit_pressure;
+    let temperature = steam_temp;
+    let critical_temperature = water_crit_temperature;
+    let acentricity_factor = Ratio::new::<ratio>(0.344);
+
+    // find volume using pr eos
+    let pr_eos_molar_vol: MolarVolume = 
+        get_molar_volume_peng_robinson_eos_gas_and_vapour_like_roots(
+            pressure, 
+            temperature, 
+            acentricity_factor, 
+            critical_pressure, 
+            critical_temperature);
+
+    // assert approx eq to within 0.1% 
+
+    assert_relative_eq!(pr_eos_molar_vol.get::<cubic_meter_per_mole>(),
+                        expected_steam_molar_vol.get::<cubic_meter_per_mole>(),
+                        max_relative=0.001);
+
+}
 
 /// this function assumes there are two roots
 ///
@@ -189,7 +280,7 @@ pub fn get_molar_volume_peng_robinson_eos_gas_and_vapour_like_roots(
 pub fn get_molar_volume_peng_robinson_eos_liquid_like_roots(
     pressure: Pressure,
     temperature: ThermodynamicTemperature,
-    accentricity_factor: Ratio,
+    acentricity_factor: Ratio,
     critical_pressure: Pressure,
     critical_temperature: ThermodynamicTemperature) -> Result<MolarVolume,CubicEOSError>{
         
@@ -206,7 +297,7 @@ pub fn get_molar_volume_peng_robinson_eos_liquid_like_roots(
         // A
         let capital_a: Ratio;
 
-        let kappa = get_kappa(accentricity_factor);
+        let kappa = get_kappa(acentricity_factor);
         let reduced_temperature: Ratio 
         = temperature/critical_temperature;
         let sqrt_alpha = Ratio::new::<ratio>(1.0)
@@ -293,12 +384,12 @@ pub enum CubicEOSError {
     NoLiquidLikeRoots,
 }
 
-fn get_kappa(accentricity_factor: Ratio) -> Ratio {
+fn get_kappa(acentricity_factor: Ratio) -> Ratio {
 
     let kappa: Ratio = 
     Ratio::new::<ratio>(0.37464) 
-    + 1.54226 * accentricity_factor 
-    - 0.26992 * accentricity_factor * accentricity_factor;
+    + 1.54226 * acentricity_factor 
+    - 0.26992 * acentricity_factor * acentricity_factor;
 
     return kappa;
 

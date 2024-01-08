@@ -42,7 +42,7 @@ Gas/vapour molecules are not uniformly shaped. The force between
 gas molecules depends on the shape. Redlich Kwong and Soave Redlich 
 Kwong (SRK) equation of state helps account for this 
 shape problem @adewumi2023phaserelations. This is accounted for 
-in the accentricity factor ($omega$) in
+in the acentricity factor ($omega$) in
 the SRK equation of state, a semi empirical EOS. 
 The SRK EOS is written as @felder2020elementary:
 
@@ -200,6 +200,29 @@ $ x^3 + 8 x^2 - 7 x + 9 = 0 $
 Roots = $mat(  -8.9001 ;
    0.4501 + 0.8993i;
    0.4501 - 0.8993i)$
+
+=== Test Cases for Finding Molar Volume Given (P,T)
+
+==== Test Case 1: critical pt of water
+Water critical properties @cengel2011thermodynamics:
+
+$T_"critical,water" = 647.1 "K"$
+
+$P_"critical,water" = 22.06 "MPa"$
+
+$V_"critical,water" = 0.0560 m^3/"kmol"$
+
+The acentricity factor $omega$ of water is:
+
+$omega_"water" = 0.344$
+
+==== Test Case 2: some superheated steam
+
+$P = 0.40 "MPa"$
+
+$T = 600 degree C$
+
+$v = 1.00558 m^3/"kg"$
 
 #bibliography("biblio.bib",
 style: "harvard-cite-them-right")
