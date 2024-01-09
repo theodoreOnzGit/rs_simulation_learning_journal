@@ -90,9 +90,97 @@ As long as $T_c$, $P_c$, $omega$ and $R$ are known...
 
 For pressure you need $tilde(V)$ and $T$;
 
+==== Temperature Solution
 For temperature you need $tilde(V)$ and $P$
 solve for a quadratic equation in $sqrt(T(K))$
 
+
+For temperature solution, I want to make the equation 
+in terms of reduced temperature $T_r$, which is 
+dimensionless.
+
+$ (P + (a(T))/ 
+(tilde(V)(tilde(V) + b) +
+b(tilde(V)-b)))(tilde(V) - b)/T_c  = R (T (kelvin))/T_c $
+
+$ (P + (a(T))/ 
+(tilde(V)(tilde(V) + b) +
+b(tilde(V)-b)))(tilde(V) - b)/T_c  = R T_r $
+
+
+
+$ (P + (a(T))/ 
+(tilde(V)(tilde(V) + b) +
+b(tilde(V)-b)))(tilde(V) - b)/(R T_c)  = T_r $
+
+$ (P(tilde(V) - b)/(R T_c) + (tilde(V) - b)/(R T_c)(a(T))/ 
+(tilde(V)(tilde(V) + b) +
+b(tilde(V)-b)))  = T_r $
+
+$ (P(tilde(V) - b)/(R T_c) + (tilde(V) - b)/(R T_c)
+(0.45724 ( R^2 T_c^2) / ( P_c ) alpha(T))/ 
+(tilde(V)(tilde(V) + b) +
+b(tilde(V)-b)))  = T_r $
+
+$ (P(tilde(V) - b)/(R T_c) + (tilde(V) - b)/(R T_c)
+(0.45724 ( R^2 T_c^2) / ( P_c ) [1 + kappa (1 -sqrt(T_r))]^2)/ 
+(tilde(V)(tilde(V) + b) +
+b(tilde(V)-b)))  = T_r $
+
+Let's simplify the terms:
+
+$ psi_1 = P(tilde(V) - b)/(R T_c)  $
+$ psi_2 = (tilde(V) - b)/(R T_c)
+(0.45724 ( R^2 T_c^2) / ( P_c ) )/ 
+(tilde(V)(tilde(V) + b) +
+b(tilde(V)-b))  $
+
+So we have:
+
+$  psi_1 + psi_2 [1 + kappa (1 -sqrt(T_r))]^2  = T_r $
+
+$  psi_1 + psi_2 [1 + kappa^2 (1 -sqrt(T_r))^2 
++ 2 kappa (1 -sqrt(T_r))]  = T_r $
+
+$  psi_1 + psi_2 [1 + kappa^2 (1 -sqrt(T_r))^2 
++  2 kappa -2 kappa sqrt(T_r)]  = T_r $
+
+$  psi_1 + psi_2 [1 + kappa^2 (1 -2 sqrt(T_r) + T_r)
++  2 kappa -2 kappa sqrt(T_r)]  = T_r $
+
+$  psi_1 + psi_2 [1 +  (kappa^2 -2 kappa^2sqrt(T_r) + kappa^2T_r)
++  2 kappa -2 kappa sqrt(T_r)]  = T_r $
+
+$  psi_1 + psi_2 [1 +  kappa^2 -2 kappa^2sqrt(T_r) + kappa^2T_r
++  2 kappa -2 kappa sqrt(T_r)]  = T_r $
+
+$  psi_1 + psi_2 [(1 +  kappa^2+  2 kappa) -2 
+kappa^2sqrt(T_r) + kappa^2T_r
+ -2 kappa sqrt(T_r)]  = T_r $
+
+$  psi_1 + psi_2 [(1 +  kappa^2+  2 kappa) - (2 
+kappa^2-2 kappa) sqrt(T_r) + kappa^2T_r ]  = T_r $
+
+$  psi_1 +  psi_2(1 +  kappa^2+  2 kappa) - psi_2
+(2 kappa^2-2 kappa) sqrt(T_r) +psi_2 kappa^2 T_r -T_r   = 0 $
+
+$  psi_1 +  psi_2(1 +  kappa^2+  2 kappa) - psi_2
+(2 kappa^2-2 kappa) sqrt(T_r) +( psi_2 kappa^2 - 1)T_r = 0 $
+
+Recall quadratic formula:
+
+For
+$ a x^2 + b x + c = 0 $
+
+$ x = (-b plus.minus sqrt(b^2-4 a c))/(2 a) $
+
+For quadratic formula:
+
+$ a = ( psi_2 kappa^2 - 1) $
+$ b = - psi_2 (2 kappa^2-2 kappa) $
+$ c = psi_1 +  psi_2(1 +  kappa^2+  2 kappa) $
+
+We solve for $sqrt(T_r)$ and then solve for $T_r$.
 
 === What about Volume?
 
