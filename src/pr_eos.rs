@@ -93,8 +93,8 @@ Result<ThermodynamicTemperature, CubicEOSError>{
 
         // todo: which root is the better one to use?
         let reduced_temperature = 
-            sqrt_reduced_temp_array[0]
-            * sqrt_reduced_temp_array[0];
+            sqrt_reduced_temp_array[1]
+            * sqrt_reduced_temp_array[1];
 
         let gas_temperature: ThermodynamicTemperature = 
             reduced_temperature.get::<ratio>() * 
