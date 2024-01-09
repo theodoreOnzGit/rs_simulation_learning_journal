@@ -4,6 +4,7 @@ use uom::si::ratio::ratio;
 use uom::si::molar_heat_capacity::joule_per_kelvin_mole;
 
 use crate::cubic_roots::find_cubic_roots;
+use crate::quadratic_roots::find_real_quadratic_roots;
 
 // if you want a new custom unit 
 // https://github.com/iliekturtles/uom/issues/244
@@ -14,14 +15,144 @@ pub fn get_temperature_peng_robinson_gas(
     specific_vol: MolarVolume, 
     acentricity_factor: Ratio, 
     critical_temperature: ThermodynamicTemperature, 
-    critical_pressure: Pressure) -> ThermodynamicTemperature{
+    critical_pressure: Pressure) -> 
+Result<ThermodynamicTemperature, CubicEOSError>{
 
         let b = get_b(critical_pressure, critical_temperature);
         let kappa = get_kappa(acentricity_factor);
+        // R
+        let molar_gas_constant = 
+        MolarHeatCapacity::new::<joule_per_kelvin_mole>(8.314);
+
+        let psi_1: Ratio = 
+            pressure * (specific_vol - b) / 
+            (molar_gas_constant * critical_temperature);
+
+        // for psi_2
+
+        let psi_2: Ratio = {
+
+            
+            let left_term = (specific_vol - b) / 
+            (molar_gas_constant * critical_temperature);
+
+            let alpha_coeff = 0.45724 * molar_gas_constant 
+                * molar_gas_constant 
+                * critical_temperature 
+                * critical_temperature 
+                / critical_pressure;
+
+            // denominator: (V(V+b) + b(V-b))
+            let denominator = specific_vol * (specific_vol + b)
+                + b * (specific_vol - b);
+
+            let psi_2 = left_term * alpha_coeff / 
+                denominator;
+
+            psi_2
+
+
+        };
+        let kappa_sq: Ratio = kappa * kappa;
+        let ratio_a: Ratio = psi_2 * kappa_sq - 
+            Ratio::new::<ratio>(1.0);
+
+        let ratio_b: Ratio = -psi_2 * (2.0* kappa_sq - 
+            2.0 * kappa);
+
+        let ratio_c: Ratio = psi_1 + psi_2 *(
+            Ratio::new::<ratio>(1.0)
+            + kappa_sq
+            + 2.0 * kappa);
+
+        //let sqrt_reduced_temp_array: [Ratio;2] 
+        //    = find_real_quadratic_roots(
+        //        ratio_a,
+        //        ratio_b,
+        //        ratio_c).unwrap();
+
+        //let reduced_temp_arr_result = 
+        //    find_real_quadratic_roots(
+        //        ratio_a, 
+        //        ratio_b, 
+        //        ratio_c);
+        //
+        //let sqrt_reduced_temp_array: [Ratio;2] = 
+        //    match reduced_temp_arr_result {
+        //        Ok(array) => array,
+        //        Err(error) => {
+        //            return Err(error);
+        //        }
+        //    };
+
+        let sqrt_reduced_temp_array: [Ratio;2] 
+            = find_real_quadratic_roots(
+                ratio_a,
+                ratio_b,
+                ratio_c)?;
+
+        // todo: which root is the better one to use?
+        let reduced_temperature = 
+            sqrt_reduced_temp_array[0]
+            * sqrt_reduced_temp_array[0];
+
+        let gas_temperature: ThermodynamicTemperature = 
+            reduced_temperature.get::<ratio>() * 
+            critical_temperature;
 
         // to do for next time
 
-        todo!()
+        return Ok(gas_temperature);
+}
+#[test]
+fn superheated_steam_temperature_test_pr_eos(){
+ 
+    use uom::si::thermodynamic_temperature::{kelvin,degree_celsius};
+    use uom::si::pressure::megapascal;
+    use uom::si::molar_volume::cubic_meter_per_mole;
+    use uom::si::specific_volume::cubic_meter_per_kilogram;
+    use uom::si::molar_mass::gram_per_mole;
+    // expected behaviour
+    let water_crit_temperature = 
+        ThermodynamicTemperature::new::<kelvin>(647.1);
+    let water_crit_pressure = 
+        Pressure::new::<megapascal>(22.06);
+    
+    let expected_steam_temp = ThermodynamicTemperature::new::<degree_celsius>(600.0);
+    let steam_pressure = Pressure::new::<megapascal>(0.40);
+    let steam_specific_vol = SpecificVolume::new::
+        <cubic_meter_per_kilogram>(1.00558);
+
+    let water_mol_wt = MolarMass::new::<gram_per_mole>(18.0);
+
+    let steam_molar_vol = steam_specific_vol * water_mol_wt;
+
+    //let steam_molar_vol = steam_specific_vol
+
+
+    // set the input parameters for the function 
+
+    let pressure = steam_pressure;
+    let critical_pressure = water_crit_pressure;
+    let critical_temperature = water_crit_temperature;
+    let acentricity_factor = Ratio::new::<ratio>(0.344);
+
+    // find temperature using pr eos
+
+    let steam_result_temperature: ThermodynamicTemperature =
+        get_temperature_peng_robinson_gas(
+            pressure, 
+            steam_molar_vol, 
+            acentricity_factor, 
+            critical_temperature, 
+            critical_pressure).unwrap();
+
+    // assert approx eq to within 0.1% 
+
+    assert_relative_eq!(steam_result_temperature.get::<kelvin>(),
+                        expected_steam_temp.get::<kelvin>(),
+                        max_relative=0.001);
+
 }
 
 pub fn get_pressure_peng_robinson_gas(
@@ -382,6 +513,8 @@ use thiserror::Error;
 pub enum CubicEOSError {
     #[error("no liquid like roots")]
     NoLiquidLikeRoots,
+    #[error("no real temperature root")]
+    NoRealTemperatureRoot,
 }
 
 fn get_kappa(acentricity_factor: Ratio) -> Ratio {

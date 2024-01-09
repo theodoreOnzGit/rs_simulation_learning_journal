@@ -16,6 +16,7 @@ mod pr_eos;
 use pr_eos::*;
 
 mod cubic_roots;
+mod quadratic_roots;
 
 mod vector_multiplication;
 
