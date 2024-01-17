@@ -167,6 +167,7 @@ $  psi_1 +  psi_2(1 +  kappa^2+  2 kappa) - psi_2
 $  psi_1 +  psi_2(1 +  kappa^2+  2 kappa) - psi_2
 (2 kappa^2-2 kappa) sqrt(T_r) +( psi_2 kappa^2 - 1)T_r = 0 $
 
+
 Recall quadratic formula:
 
 For
@@ -181,7 +182,26 @@ $ b = - psi_2 (2 kappa^2-2 kappa) $
 $ c = psi_1 +  psi_2(1 +  kappa^2+  2 kappa) $
 
 We solve for $sqrt(T_r)$ and then solve for $T_r$.
+=== which root of reduced temperature should we use?
 
+We know the discriminant $(b^2 - 4 a c) gt.eq 0$ for real roots.
+
+For positive b and positive a, we will likely take this root:
+$ x = (-b + sqrt(b^2-4 a c))/(2 a) $
+
+However, it is hard to see if a or b are positive just by one look.
+
+We can look at b:
+$ b = - psi_2 (2 kappa^2-2 kappa) $
+$ b = - psi_2 2 kappa (kappa - 1) $
+
+Given that $kappa <1$, we can expect $b > 0$:
+
+$ b =  psi_2 2 kappa (1 - kappa ) $
+
+We can check the value of $a$, but maybe there's a simpler way.
+
+We can just check if $sqrt(T_r) > 0$ in the program and use that root.
 === What about Volume?
 
 You'll need to solve cubic equations of state.
